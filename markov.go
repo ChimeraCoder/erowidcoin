@@ -142,7 +142,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r := io.MultiReader(strings.NewReader(experience), os.Stdin)
+	lr := &io.LimitedReader{os.Stdin, int64(len(experience))}
+
+	r := io.MultiReader(strings.NewReader(experience), lr)
 
 	c := NewChain(*prefixLen) // Initialize a new Chain.
 
