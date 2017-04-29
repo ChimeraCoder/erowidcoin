@@ -56,7 +56,10 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/erowidparser"
+	"github.com/sirupsen/logrus"
 )
+
+var log = logrus.New()
 
 // Prefix is a Markov chain prefix of one or more words.
 type Prefix []string
@@ -118,9 +121,12 @@ func (c *Chain) Generate(n int) string {
 }
 
 func main() {
+	// How many more bytes will be read from Erowid
+	const ErowidMultiplier = 0.5
+
 	// Register command-line flags.
 	numWords := flag.Int("words", 100, "maximum number of words to print")
-	prefixLen := flag.Int("prefix", 2, "prefix length in words")
+	prefixLen := flag.Int("prefix", 1, "prefix length in words")
 	archivePath := flag.String("archivepath", "", "erowidArchive")
 
 	//erowidFile := flag.String("erowidFile", "", "file of Erowid archive")
@@ -142,7 +148,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lr := &io.LimitedReader{os.Stdin, int64(len(experience))}
+	lr := &io.LimitedReader{os.Stdin, int64(ErowidMultiplier * float64(len(experience)))}
 
 	r := io.MultiReader(strings.NewReader(experience), lr)
 
